@@ -16,21 +16,40 @@
 
 package com.app.mycoffeeapp.ui.base
 
+import android.Manifest.permission.CAMERA
 import android.annotation.TargetApi
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import com.app.mycoffeeapp.R
 import com.app.mycoffeeapp.ui.splash.SplashActivity
 import com.app.mycoffeeapp.utils.CommonUtils
+import com.app.mycoffeeapp.utils.Logg
 import com.app.mycoffeeapp.utils.NetworkUtils
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.custom_toolbar.view.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.*
 
 /**
  * Created by amitshekhar on 07/07/17.
@@ -59,12 +78,23 @@ abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppComp
     @get:LayoutRes
     abstract val layoutId: Int
 
+    abstract val title: String?
+    abstract val toolbar: Toolbar?
+
+    open fun onCameraSelected() {
+
+    }
+
+    open fun onGallerySelected() {
+
+    }
+
     /**
      * Override for set view model
      *
      * @return view model instance
      */
-    abstract val viewModel: V
+    abstract fun getViewModel(): V?
 
     val isNetworkConnected: Boolean
         get() = NetworkUtils.isNetworkConnected(applicationContext)
@@ -77,7 +107,6 @@ abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppComp
 
     }
 
-    override fun attachBaseContext(newBase: Context) {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         performDependencyInjection()
@@ -85,9 +114,25 @@ abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppComp
         performDataBinding()
     }
 
+    open var TAG = "BaseActivity"
+
+    fun initToolbar() {
+
+        if (toolbar == null)
+            Logg.e(TAG, "toolbar is nulll: ")
+        val toolBarTitle = toolbar?.findViewById<AppCompatTextView>(R.id.toolBarTitle)
+        toolBarTitle?.text = title
+        toolbar?.let { setSupportActionBar(it as Toolbar?) }
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
-    fun hasPermission(permission: String): Boolean {
-        return Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+    fun hasPermission(vararg permissions: String): Boolean {
+        var hasPermission = true
+        for (per in permissions) {
+            hasPermission =
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.M || checkSelfPermission(per) == PackageManager.PERMISSION_GRANTED
+        }
+        return hasPermission
     }
 
     fun hideKeyboard() {
@@ -127,10 +172,12 @@ abstract class BaseActivity<T : ViewDataBinding, V : BaseViewModel<*>> : AppComp
 
     private fun performDataBinding() {
         viewDataBinding = DataBindingUtil.setContentView(this, layoutId)
-        this.mViewModel = if (mViewModel == null) viewModel else mViewModel
+        this.mViewModel = if (mViewModel == null) getViewModel() else mViewModel
         viewDataBinding?.setVariable(bindingVariable, mViewModel)
         viewDataBinding?.executePendingBindings()
-        AndroidInjection.inject(this)
+        initToolbar()
     }
+
+
 }
 

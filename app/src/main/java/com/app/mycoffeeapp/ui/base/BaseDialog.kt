@@ -39,14 +39,14 @@ abstract class BaseDialog : DialogFragment() {
         private set
 
     val isNetworkConnected: Boolean
-        get() = baseActivity != null && baseActivity!!.isNetworkConnected
+        get() = baseActivity?.isNetworkConnected ?: false
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context is BaseActivity<*, *>) {
+        if (context is BaseActivity<*, *>?) {
             val mActivity = context as BaseActivity<*, *>?
             this.baseActivity = mActivity
-            mActivity!!.onFragmentAttached()
+            mActivity?.onFragmentAttached()
         }
     }
 
@@ -82,39 +82,29 @@ abstract class BaseDialog : DialogFragment() {
     override fun show(fragmentManager: FragmentManager, tag: String) {
         val transaction = fragmentManager.beginTransaction()
         val prevFragment = fragmentManager.findFragmentByTag(tag)
-        if (prevFragment != null) {
-            transaction.remove(prevFragment)
-        }
+        prevFragment?.let { transaction.remove(it) }
         transaction.addToBackStack(null)
         show(transaction, tag)
     }
 
     fun dismissDialog(tag: String) {
         dismiss()
-        baseActivity!!.onFragmentDetached(tag)
+        baseActivity?.onFragmentDetached(tag)
     }
 
     fun hideKeyboard() {
-        if (baseActivity != null) {
-            baseActivity!!.hideKeyboard()
-        }
+        baseActivity?.hideKeyboard()
     }
 
     fun hideLoading() {
-        if (baseActivity != null) {
-            baseActivity!!.hideLoading()
-        }
+        baseActivity?.hideLoading()
     }
 
     fun openActivityOnTokenExpire() {
-        if (baseActivity != null) {
-            baseActivity!!.openActivityOnTokenExpire()
-        }
+        baseActivity?.openActivityOnTokenExpire()
     }
 
     fun showLoading() {
-        if (baseActivity != null) {
-            baseActivity!!.showLoading()
-        }
+        baseActivity?.showLoading()
     }
 }

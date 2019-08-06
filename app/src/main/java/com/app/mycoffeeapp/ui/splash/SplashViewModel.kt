@@ -3,6 +3,7 @@ package com.app.mycoffeeapp.ui.splash
 import com.app.mycoffeeapp.data.DataManager
 import com.app.mycoffeeapp.ui.base.BaseViewModel
 import com.app.mycoffeeapp.utils.Logg
+import java.lang.Exception
 
 /**
  *
@@ -14,7 +15,16 @@ class SplashViewModel(dataManager: DataManager) : BaseViewModel<SplashNavigator>
         // check user is logged in or not
         var data = dataManager.insertData()
         Logg.e(TAG, ": $data")
-        getNavigator()?.openHome()
+
+        Thread(Runnable {
+            try {
+                Thread.sleep(1000)
+            } catch (e: Exception) {
+
+            } finally {
+                getNavigator()?.openHome()
+            }
+        }).start()
     }
 
 
