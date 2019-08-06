@@ -1,6 +1,5 @@
 package com.app.mycoffeeapp.data.model
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -14,7 +13,8 @@ class Item {
 
     var name: String? = null
 
-    var price: Float? = null
+    var price: String? = null
 
     var updatedAt: String? = null
+    var imageLocalPath: String? = null
 }

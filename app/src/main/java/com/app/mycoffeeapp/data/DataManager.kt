@@ -1,5 +1,6 @@
 package com.app.mycoffeeapp.data
 
-interface DataManager {
-    fun insertData(): String
+import com.app.mycoffeeapp.data.local.DbHelper
+
+interface DataManager : DbHelper {
 }

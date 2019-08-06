@@ -160,7 +160,7 @@ class MediaHelper {
     }
 
 
-    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == Activity.RESULT_OK) {
             if (mediaHolderList!!.containsKey(requestCode)) {
                 val mediaHolder = mediaHolderList!![requestCode]
@@ -177,12 +177,11 @@ class MediaHelper {
                             var inputStream: InputStream? = null
                             if (mActivity != null) {
                                 inputStream = mActivity?.contentResolver?.openInputStream(
-                                    data
-                                        .data!!
+                                    data?.data!!
                                 )
                             } else if (mFragment != null) {
                                 inputStream = mFragment?.activity!!.contentResolver
-                                    .openInputStream(data.data!!)
+                                    .openInputStream(data?.data!!)
                             }
                             if (inputStream != null) {
                                 val fileOutputStream = FileOutputStream(mediaHolder.file)

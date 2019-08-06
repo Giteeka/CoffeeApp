@@ -8,12 +8,11 @@ import dagger.android.AndroidInjectionModule
 import javax.inject.Singleton
 
 /**
- *
  * Created by admin on 8/5/2019.
  */
 
 @Singleton
-@Component(modules = [AppModule::class, AndroidInjectionModule::class, ActivityModule::class])
+@Component(modules = [AppModule::class, AndroidInjectionModule::class, ActivityModule::class,DialogModule::class])
 interface AppComponent {
 
     fun inject(app: App)

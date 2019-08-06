@@ -19,9 +19,8 @@ class AddImageDialog : BaseDialog() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding =
-            DataBindingUtil.inflate<DialogAddImageBinding>(inflater, R.layout.dialog_add_image, container, false)
-        val view = binding.root
+        binding = DataBindingUtil.inflate<DialogAddImageBinding>(inflater, R.layout.dialog_add_image, container, false)
+        val view = binding?.root
         AndroidSupportInjection.inject(this)
         init()
         return view
@@ -30,15 +29,18 @@ class AddImageDialog : BaseDialog() {
     private fun init() {
         binding?.camera?.setOnClickListener {
             baseActivity?.onCameraSelected()
+            dismissDialog()
         }
         binding?.gallery?.setOnClickListener {
             baseActivity?.onGallerySelected()
+            dismissDialog()
         }
     }
 
     fun show(fragmentManager: FragmentManager) {
         super.show(fragmentManager, TAG)
     }
+
 
     companion object {
 

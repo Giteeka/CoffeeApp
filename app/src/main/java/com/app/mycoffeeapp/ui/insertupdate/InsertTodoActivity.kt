@@ -1,9 +1,6 @@
 package com.app.mycoffeeapp.ui.insertupdate
 
-import android.Manifest
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.widget.Toolbar
@@ -16,11 +13,16 @@ import com.app.mycoffeeapp.mediaHelper.MediaCallback
 import com.app.mycoffeeapp.mediaHelper.MediaHelper
 import com.app.mycoffeeapp.ui.AddImageDialog
 import com.app.mycoffeeapp.ui.base.BaseActivity
+import com.app.mycoffeeapp.utils.CommonUtils
+import com.app.mycoffeeapp.utils.Logg
 import java.io.File
 import javax.inject.Inject
 
 class InsertTodoActivity : BaseActivity<ActivityInsertTodoBinding, InsertUpdateViewModel>(),
     InsertUpdateNavigator {
+    override fun showMessage(s: String) {
+        CommonUtils.showErrorMessage(s)
+    }
 
     companion object {
         fun newIntent(context: BaseActivity<*, *>?): Intent? {
@@ -59,15 +61,17 @@ class InsertTodoActivity : BaseActivity<ActivityInsertTodoBinding, InsertUpdateV
     }
 
     override fun onCameraSelected() {
+        Logg.e(TAG, "onCameraSelected: ")
         mMediaHelper?.takePictureFromCamera(object : MediaCallback() {
             override fun onCancel() {
 
             }
 
             override fun onResult(status: Boolean, file: File, mediaType: MediaHelper.Media) {
-                if (status && file != null && file.exists()) {
-                    var mFilePhoto = file
+                if (status && file?.exists()) {
+                    val mFilePhoto = file
                     Log.e("FILE PATH", "mFilePhoto: " + mFilePhoto?.absolutePath)
+                    getViewModel()?.setPath(mFilePhoto?.absolutePath)
 
                 } else {
                     showError("sdsdasd")
@@ -76,9 +80,17 @@ class InsertTodoActivity : BaseActivity<ActivityInsertTodoBinding, InsertUpdateV
         }, false)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        mMediaHelper?.onActivityResult(requestCode, resultCode, data)
+    }
+
     override fun onGallerySelected() {
+        Logg.e(TAG, "onGallerySelected: ")
         mMediaHelper?.takePictureFromGallery(object : MediaCallback() {
             override fun onCancel() {
+
             }
 
 
@@ -86,6 +98,7 @@ class InsertTodoActivity : BaseActivity<ActivityInsertTodoBinding, InsertUpdateV
                 if (status && file != null && file.exists()) {
                     var mFilePhoto = file
                     Log.e("FILE PATH", "mFilePhoto: " + mFilePhoto.absolutePath)
+                    getViewModel()?.setPath(mFilePhoto?.absolutePath)
 
                 } else {
                     showError("sdasdad")
@@ -96,13 +109,14 @@ class InsertTodoActivity : BaseActivity<ActivityInsertTodoBinding, InsertUpdateV
     }
 
     var mMediaHelper: MediaHelper? = null
-    private fun openImageSelectionDialog() {
+
+    override fun openImageSelectionDialog() {
+        Logg.e(TAG, "openImageSelectionDialog: ")
         if (mMediaHelper == null)
             mMediaHelper = MediaHelper(this, MediaHelper.Media.IMAGE)
         val imageDialog = AddImageDialog.newInstance()
         imageDialog.setCancelable(true)
         imageDialog.show(supportFragmentManager)
-
     }
 
     private fun showError(s: String) {
